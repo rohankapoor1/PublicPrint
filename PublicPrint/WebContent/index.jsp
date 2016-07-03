@@ -15,7 +15,7 @@
 		</form>
 	</div>
 	<br>
-	<form action="DownloadFile" method="post" >
+	<form action="DownloadFile" method="get" >
 		<input type="text" name="userid" value="1234"/> <br/>
 		<input type="password" name="key"/>
 		<input type="submit" value="Download File" />

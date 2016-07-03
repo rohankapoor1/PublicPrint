@@ -83,7 +83,7 @@ public class FileUploadHandler extends HttpServlet {
 				}
 
 				// File uploaded successfully
-				request.setAttribute("message", "File Uploaded Successfully");
+				request.setAttribute("message", "File Uploaded Successfully with key: " + key);
 			} catch (Exception ex) {
 				request.setAttribute("message", "File Upload Failed due to " + ex);
 			}
@@ -96,7 +96,7 @@ public class FileUploadHandler extends HttpServlet {
 
 	}
 
-	private String encrypt(String key) {
+	public static String encrypt(String key) {
 		try {
             // Create MessageDigest instance for MD5
             MessageDigest md = MessageDigest.getInstance("MD5");
