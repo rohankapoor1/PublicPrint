@@ -14,6 +14,7 @@ import javax.servlet.ServletOutputStream;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
 
 @WebServlet(urlPatterns={"/fetch"})
 public class FetchFile extends javax.servlet.http.HttpServlet implements javax.servlet.Servlet {
@@ -24,7 +25,14 @@ public class FetchFile extends javax.servlet.http.HttpServlet implements javax.s
 	protected void doGet(HttpServletRequest request, HttpServletResponse response)
 			throws ServletException, IOException {
 
-		filePath = "E:" + File.separator + "uploads" + File.separator + "Capture.png";//request.getParameter("filepath");
+		//invalidate the session if exists
+    	HttpSession session = request.getSession(false);
+    	String path = (String) session.getAttribute("path-meta");
+    	System.out.println("User="+ session.getAttribute("path-meta"));
+    	if(session == null){
+    		request.getRequestDispatcher("index.jsp").forward(request, response);
+    	}
+		filePath = "E:" + File.separator + "uploads" + File.separator + path + File.separator +request.getParameter("filepath");
 		/*
 		 * getServletContext().getRealPath("") + File.separator + "abc.txt";
 		 */

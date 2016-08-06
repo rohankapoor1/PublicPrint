@@ -2,6 +2,9 @@ package com.test;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.sql.Connection;
@@ -21,7 +24,7 @@ import org.apache.commons.fileupload.servlet.ServletFileUpload;
 
 
 public class FileUploadHandler extends HttpServlet {
-	private final String UPLOAD_DIRECTORY = "E:" + File.separator + "uploads";
+	public String UPLOAD_DIRECTORY = "E:" + File.separator + "uploads";
 
 	@Override
 	protected void doPost(HttpServletRequest request, HttpServletResponse response)
@@ -73,6 +76,17 @@ public class FileUploadHandler extends HttpServlet {
 				}
 				if(allSet)
 				{
+					UPLOAD_DIRECTORY = UPLOAD_DIRECTORY.concat(File.separator).concat(userId).concat(File.separator).concat(String.valueOf(collectionTime));
+					Path path = Paths.get(UPLOAD_DIRECTORY);
+				        //if directory exists?
+				        if (!Files.exists(path)) {
+				            try {
+				                Files.createDirectories(path);
+				            } catch (IOException e) {
+				                //fail to create directory
+				                e.printStackTrace();
+				            }
+				        }
 					for (FileItem item : multiparts) {
 						if (!item.isFormField())
 						{
