@@ -1,7 +1,9 @@
 package com.test;
 
 import java.io.File;
+import java.io.FileWriter;
 import java.io.IOException;
+import java.io.PrintWriter;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -18,29 +20,36 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
+
 import org.apache.commons.fileupload.FileItem;
 import org.apache.commons.fileupload.disk.DiskFileItemFactory;
 import org.apache.commons.fileupload.servlet.ServletFileUpload;
+import org.apache.tomcat.util.http.fileupload.UploadContext;
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
 
 
 public class FileUploadHandler extends HttpServlet {
-	public String UPLOAD_DIRECTORY = "E:" + File.separator + "uploads";
 
 	@Override
 	protected void doPost(HttpServletRequest request, HttpServletResponse response)
 			throws ServletException, IOException {
 
+		String UPLOAD_DIRECTORY = null;
 		// process only if its multipart content
 		if (ServletFileUpload.isMultipartContent(request)) {
 			try {
 				boolean allSet = true;
 				List<FileItem> multiparts = new ServletFileUpload(new DiskFileItemFactory()).parseRequest(request);
-				String userId = null;
+				HttpSession session = request.getSession(false);
+		    	String userId = (String) session.getAttribute("mobNo");
 				String key = getAccessKey();
 				String encKey = encrypt(key);
 				PreparedStatement ps = null;
 				Connection conn = null;
-				long collectionTime = System.currentTimeMillis();
+				long collectionTime = (long) session.getAttribute("createTime");
 				try
 				{
 					Class.forName("com.mysql.jdbc.Driver").newInstance();
@@ -48,10 +57,6 @@ public class FileUploadHandler extends HttpServlet {
 					conn.setAutoCommit(false);
 					ps = conn.prepareStatement("insert into objectmaster (MobNo,`Key`,`File`,CollectionTime) values (?,?,?,?)");
 					for (FileItem item : multiparts) {
-						if(item.isFormField())
-						{
-							userId = item.getString();
-						}
 						if (!item.isFormField()) {
 							String fileName = new File(item.getName()).getName();
 							ps.setLong(1, Long.valueOf(userId));
@@ -76,7 +81,7 @@ public class FileUploadHandler extends HttpServlet {
 				}
 				if(allSet)
 				{
-					UPLOAD_DIRECTORY = UPLOAD_DIRECTORY.concat(File.separator).concat(userId).concat(File.separator).concat(String.valueOf(collectionTime));
+					UPLOAD_DIRECTORY = "E:" + File.separator + "uploads".concat(File.separator).concat(userId).concat(File.separator).concat(String.valueOf(collectionTime));
 					Path path = Paths.get(UPLOAD_DIRECTORY);
 				        //if directory exists?
 				        if (!Files.exists(path)) {
@@ -95,6 +100,11 @@ public class FileUploadHandler extends HttpServlet {
 						}
 					}
 				}
+				
+				File f = new File(UPLOAD_DIRECTORY + File.separator + "key.txt");
+				FileWriter fw = new FileWriter(f);
+				fw.write("File Uploaded Successfully with key: " + key);
+				fw.close();
 
 				// File uploaded successfully
 				request.setAttribute("message", "File Uploaded Successfully with key: " + key);
@@ -105,8 +115,21 @@ public class FileUploadHandler extends HttpServlet {
 		} else {
 			request.setAttribute("message", "Sorry this Servlet only handles file upload request");
 		}
+		JSONObject jsob = new JSONObject();
+		PrintWriter out = response.getWriter();
+		try
+		{
+			jsob.put("success", true);
+			out.print(jsob);
+		} catch (JSONException e) {
+			e.printStackTrace();
+		}
+		finally
+		{
+			out.close();
+		}
+//		request.getRequestDispatcher("/start.jsp").forward(request, response);
 
-		request.getRequestDispatcher("/result.jsp").forward(request, response);
 
 	}
 

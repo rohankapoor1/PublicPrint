@@ -9,9 +9,9 @@
 <body>
 	<div>
 		<h3>Choose File to Upload in Server</h3>
-		<form action="upload" method="post" enctype="multipart/form-data">
+		<form action="startSession" method="post" >
 		<input type="text" name="userid" value="1234"/> <br/>
-		<input type="file" name="filename" multiple/> <input type="submit" value="upload" />
+		<input type="submit" value="Start Session" />
 		</form>
 	</div>
 	<br>

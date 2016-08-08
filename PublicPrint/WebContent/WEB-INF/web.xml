@@ -19,6 +19,15 @@
 <url-pattern>/DownloadFile</url-pattern>
 </servlet-mapping>
   
+  <servlet>
+        <servlet-name>CreateSession</servlet-name>
+        <servlet-class>com.test.CreateSession</servlet-class>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>CreateSession</servlet-name>
+        <url-pattern>/startSession</url-pattern>
+    </servlet-mapping>
+  
     <session-config>
         <session-timeout>
             30
